@@ -704,8 +704,8 @@ bool SpeedyStepper::moveToHomeInSteps(long directionTowardHome,
     SWITCH_MODE_OFF = 0;
     SWITCH_MODE_ON = 1;
   } else {
-    SWITCH_MODE_HIGHLOW = 1;
-    SWITCHMODE_ON = 0;
+    SWITCH_MODE_OFF = 1;
+    SWITCH_MODE_ON = 0;
   }
 
   //
@@ -767,7 +767,7 @@ bool SpeedyStepper::moveToHomeInSteps(long directionTowardHome,
   limitSwitchFlag = false;
   while(!processMovement())
   {
-    if (digitalRead(homeLimitSwitchPin) == SWITCHMODE_ON)
+    if (digitalRead(homeLimitSwitchPin) == SWITCH_MODE_ON)
     {
       limitSwitchFlag = true;
       break;
