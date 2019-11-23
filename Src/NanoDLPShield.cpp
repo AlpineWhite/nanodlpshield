@@ -269,6 +269,8 @@ bool parseGCommand(const char * cmd)
         {
           // Set direction, speed, travel, and endstop in Config.h
           stepper.moveToHomeInMillimeters(HOME_DIR, HOME_SPD, HOME_HEIGHT, Z_STOP_PIN);
+          ptyWrite("Z_move_comp");
+          updateLastMovement();
         }
         case 90: // G90 - Set Absolute Positioning
             relativePositioning = false;
