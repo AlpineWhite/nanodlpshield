@@ -40,8 +40,8 @@ const int DOWN_BTN_PUD = 2; // PUD_UP
 #endif //SUPPORT_UP_DOWN_BUTTONS
 
 //Enable support of limit switches
-const int Z_BOT_STOP = 20;
-const int Z_TOP_STOP = 21;
+const int Z_BOT_PIN = 20;
+const int Z_TOP_PIN = 21;
 
 //Pull UP/DN for limit switches. (Both set to active high)
 const int Z_BOT_PUD = 2;
