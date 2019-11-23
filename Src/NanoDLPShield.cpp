@@ -168,15 +168,26 @@ void setup()
     // Signaling (general purpose) LED
     pinMode(LED_PIN, OUTPUT);
 
-    // FAN
+    // FAN PWM Range is 0-1024 and called via pwmWrite(int pin, int value)
+    // Initialize as off
     pinMode(FAN_PIN, OUTPUT);
-    digitalWrite(FAN_PIN, 1);
+    pwmWrite(FAN_PIN, 0);
 
     //ENDSTOPS
-    pinMode(Z_BOT_PIN, INPUT);
-    pullUpDnControl(Z_BOT_PIN, Z_BOT_PUD);
-    pinMode(Z_TOP_PIN, INPUT);
-    pullUpDnControl(Z_TOP_PIN, Z_TOP_PUD);
+    pinMode(Z_STOP_PIN, INPUT);
+    pullUpDnControl(Z_STOP_PIN, Z_STOP_PUD);
+}
+
+bool checkMCommand(const char * buf, char prefix)
+{
+  const char * ptr = buf;
+  ptr = strchr(ptr, prefix);
+  if(ptr == NULL)
+  {
+    return false;
+  } else {
+    return true;
+  }
 }
 
 int parseInt(const char * buf, char prefix, int value)
@@ -256,8 +267,8 @@ bool parseGCommand(const char * cmd)
         }
         case 28: // G28 Home
         {
-          // Set as direction, speed in steps/s, total dteps dist, home switch pin
-          stepper.moveToHomeInSteps(-1, 500, 15500, Z_BOT_PIN);
+          // Set direction, speed, travel, and endstop in Config.h
+          stepper.moveToHomeInMillimeters(HOME_DIR, HOME_SPD, HOME_HEIGHT, Z_STOP_PIN);
         }
         case 90: // G90 - Set Absolute Positioning
             relativePositioning = false;
@@ -279,13 +290,30 @@ bool parseMCommand(const char * cmd)
     {
     case 3: // M3/M106 - UV LED On
     case 106:
-        processLEDOnCmd();
-        return true;
+    {
+        if(checkMCommand(cmd, 'P'))
+        {
+          float spd = parseFloat(cmd, 'S', 0);
+          pwmWrite(FAN_PIN, spd);
+        } else {
+          processLEDOnCmd();
+          return true;
+        }
+
+    }
 
     case 5: // M5/M107 - UV LED Off
     case 107:
-        processLEDOffCmd();
-        return true;
+    {
+        if(checkMCommand(cmd, 'P'))
+        {
+          pwmWrite(FAN_PIN, 0);
+        } else {
+          processLEDOffCmd();
+          return true;
+        }
+
+    }
 
     case 17: // M17 - Motor on
         processMotorOnCmd();

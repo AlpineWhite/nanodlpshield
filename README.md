@@ -73,12 +73,11 @@ sudo apt-get install cmake g++ wiringpi
 -Git clone the repo
 -Use Nano to edit:
     -> Config.h
-        -> steps/mm
+        -> steps/mm and leadscrew settings
+        -> set speeds and accelerations
+        -> set the pull up/dn mode per active high or active low endstops
+        -> set endstop at top or bottom (pin definition 21 for top 20 for bottom)
         -> defined/commented hardware button support
-    -> SpeedyStepper.cpp
-        -> Steps/rev
-        -> speeds in steps/s
-        -> accelerations in steps/s/s
 
  create cmake dependencies with:
  ```bash
@@ -113,7 +112,9 @@ sudo apt-get install cmake g++ wiringpi
  - G90
  - G91
  - M3 / M106 (UV LED On)
+ - M106 P1 SXXXX (set fan headers to PWM value XXXX between 0 and 1023)
  - M5 / M107 (UV LED Off)
+ - M107 P1 (turn all fans off)
  - M18 (disable motors)
  - M114 (get current position)
 
@@ -128,8 +129,9 @@ sudo apt-get install cmake g++ wiringpi
 
  Configuration options for:
   - Max Height
-  - Max Speeds
-  - Motion parameters via Config.h
-  - Max Accelerations
+  - [s]Max Speeds[/s]
+  - [s]Motion parameters via Config.h[/s]
+  - [s]Max Accelerations[/s]
   - Fan control based on printing (fans on when UV LED is on and then on for 5 mins after finish of print)
+  - [s]Implement PWM fan control[/s]
   - Detailed setup instructions

@@ -9,7 +9,10 @@ const int STEP_PIN = 6;
 const int ENABLE_PIN = 12;
 
 // Steps in 1mm along Z axis
-const float STEPS_PER_MM = 200*16/2; //steps per revolution * microstepping / mm per revolution
+const int STEPS_PER_REV = 200; //Set steps/rev of motor. 200 for 1.8* 400 for .9* NEMA17
+const int MICROSTEP_SET = 16; //Set microstepping of your Driver
+const int LEAD_LEN = 2; // set leadscrew lead length
+const float STEPS_PER_MM = STEPS_PER_REV*MICROSTEP_SET/LEAD_LEN; //calculate steps/mm
 const float DEFAULT_SPEED = 6; // mm/s
 const float DEFAULT_ACCELERATION = 20; // mm/s2
 
@@ -39,13 +42,16 @@ const int DOWN_BTN_PUD = 2; // PUD_UP
 
 #endif //SUPPORT_UP_DOWN_BUTTONS
 
-//Enable support of limit switches
-const int Z_BOT_PIN = 20;
-const int Z_TOP_PIN = 21;
+//Enable support of limit switches Set to 20 for bottom home, set to 21 for top home
+const int Z_STOP_PIN = 20;
 
-//Pull UP/DN for limit switches. (Both set to active high)
-const int Z_BOT_PUD = 2;
-const int Z_TOP_PUD = 2;
+//Pull UP/DN for limit switches. (Both set to active low. Set PUD to 1 for active high)
+const int Z_STOP_PUD = 2;
+
+//Homing parameters. Direction 1 is up and DIrection -1 is down.
+const long HOME_DIR = -1;
+const float HOME_SPD = 10; // In mm/s
+const long HOME_HEIGHT = 150; //Set max dist to travel in mm during homing
 
 // Enable this option if the printer has hardware LED On/Off button
 //#define SUPPORT_LED_ON_BUTTON 1
