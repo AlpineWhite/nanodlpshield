@@ -683,7 +683,8 @@ bool SpeedyStepper::moveToHomeInSteps(long directionTowardHome,
 {
   float originalDesiredSpeed_InStepsPerSecond;
   bool limitSwitchFlag;
-
+  int SMITCH_MODE_OFF;
+  int SWITCH_MODE_ON;
 
   //
   // setup the home switch input pin
@@ -702,14 +703,14 @@ bool SpeedyStepper::moveToHomeInSteps(long directionTowardHome,
   {
   case 1:
     {
-      int SWITCH_MODE_OFF = 0;
-      int SWITCH_MODE_ON = 1;
+      SWITCH_MODE_OFF = 0;
+      SWITCH_MODE_ON = 1;
       break;
     }
   case 2:
     {
-      int SWITCH_MODE_HIGHLOW = 1;
-      int SWITCHMODE_ON = 0;
+      SWITCH_MODE_HIGHLOW = 1;
+      SWITCHMODE_ON = 0;
       break;
     }
   }
