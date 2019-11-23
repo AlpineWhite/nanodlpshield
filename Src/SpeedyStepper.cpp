@@ -683,7 +683,7 @@ bool SpeedyStepper::moveToHomeInSteps(long directionTowardHome,
 {
   float originalDesiredSpeed_InStepsPerSecond;
   bool limitSwitchFlag;
-  int SMITCH_MODE_OFF;
+  int SWITCH_MODE_OFF;
   int SWITCH_MODE_ON;
 
   //
