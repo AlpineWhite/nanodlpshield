@@ -256,7 +256,8 @@ bool parseGCommand(const char * cmd)
         }
         case 28: // G28 Home
         {
-
+          // Set as direction, speed in steps/s, total dteps dist, home switch pin
+          stepper.moveToHomeInSteps(-1, 500, 15500, Z_BOT_PIN);
         }
         case 90: // G90 - Set Absolute Positioning
             relativePositioning = false;
