@@ -699,20 +699,13 @@ bool SpeedyStepper::moveToHomeInSteps(long directionTowardHome,
   originalDesiredSpeed_InStepsPerSecond = desiredSpeed_InStepsPerSecond;
 
   // Evaluate active high or active low endstops
-  switch(Z_STOP_PUD)
+  if(Z_STOP_PUD == 1)
   {
-    case 1:
-    {
-      SWITCH_MODE_OFF = 0;
-      SWITCH_MODE_ON = 1;
-      break;
-    }
-    case 2:
-    {
-      SWITCH_MODE_HIGHLOW = 1;
-      SWITCHMODE_ON = 0;
-      break;
-    }
+    SWITCH_MODE_OFF = 0;
+    SWITCH_MODE_ON = 1;
+  } else {
+    SWITCH_MODE_HIGHLOW = 1;
+    SWITCHMODE_ON = 0;
   }
 
   //
