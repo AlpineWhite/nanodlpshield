@@ -333,7 +333,22 @@ bool parseMCommand(const char * cmd)
         ptyWrite(s.str());
         return true;
     }
+    case 300:
+    {
+        if(checkMCommand(cmd, 'S'))
+        {
+          long i = millis();
+          float len = parseFloat(cmd, 'S', 0);
+          long j = i+len;
+          while(islessequal(i,j))
+          {
+            digitalWrite(BUZZ_PIN,1);
+          }
+          digitalWrite(BUZZ_PIN,0);
+        }
     }
+    }
+
 
     return false;
 }

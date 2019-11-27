@@ -13,8 +13,8 @@ const int STEPS_PER_REV = 200; //Set steps/rev of motor. 200 for 1.8* 400 for .9
 const int MICROSTEP_SET = 16; //Set microstepping of your Driver
 const int LEAD_LEN = 2; // set leadscrew lead length
 const float STEPS_PER_MM = STEPS_PER_REV*MICROSTEP_SET/LEAD_LEN; //calculate steps/mm
-const float DEFAULT_SPEED = 6; // mm/s
-const float DEFAULT_ACCELERATION = 20; // mm/s2
+const float DEFAULT_SPEED = 2; // mm/s
+const float DEFAULT_ACCELERATION = 13.33; // mm/s2
 
 
 // Enable this option if the printer has hardware up/down button.

@@ -1,6 +1,6 @@
 # NanoDLP Shield Firmware
 
-This is a firmare for custom RaspberryPi shield to drive LCD 3d printer based on NanoDLP software.  I am not satisfied with the lack of flexibility of the ChituBoard in my Elegoo Mars, nor the completely proprietary Gcode/Firmware.
+This is a firmare for custom RaspberryPi shield to drive LCD 3d printer based on NanoDLP software.  I am not satisfied with the lack of flexibility of the ChituBoard in my Elegoo Mars, nor the ly proprietary Gcode/Firmware.
 
 [NanoDLP](https://www.nanodlp.com/) is a web-based control for LCD or DLP 3D printer. It allows the user to upload
 a model to print, slice it, and then drive 3D printer hardware (LCD, motors, shutters) in order to print the model.  Slicing can be performed on the host (typically a Pi) or by remote application on Windows/Linux/Mac which is then uploaded to the Pi. It provides full web control, a decent user interface, and supports up to ridiculous resolutions.
@@ -60,7 +60,13 @@ Choice: Add 2x JST-XH 3-Pin and 1x JST-XH 4-Pin for Motor + E-stop connectors or
 
 # Software
 
-Software is based on WiringPi library which provides a Arduino-like interface to drive RasPi's GPIOs. Additionally it uses
+***
+NanoDlp Easy Installer throws dhcpcd5 package errors. This will cause the Pi to hang and fail after install. Please only use the advanced install with wget on the NanoDlp install page.
+***
+
+Software is based on WiringPi library which provides a Arduino-like interface to drive RasPi's GPIOs. WiringPi is no longer in development, and its creator will no longer support it.  I am in search of alternate C++/C implementations. Java is too slow for real-time interrupts. Tests on a Pi2 show Java capped at ~20kHz and C/C++ at closer to 4MHz GPIO square wave output.
+
+Additionally it uses
 [SpeedyStepper](https://github.com/Stan-Reifel/SpeedyStepper) library with minor modifications to drive stepper motor.
 
 Installing prerequisites
@@ -128,10 +134,10 @@ sudo apt-get install cmake g++ wiringpi
 # Planned additions:
 
  Configuration options for:
-  - Max Height
-  - [s]Max Speeds[/s]
-  - [s]Motion parameters via Config.h[/s]
-  - [s]Max Accelerations[/s]
+  - ~~~Max Height~~~
+  - ~~~Max Speeds~~~
+  - ~~~Motion parameters via Config.h~~~
+  - ~~~Max Accelerations~~~
   - Fan control based on printing (fans on when UV LED is on and then on for 5 mins after finish of print)
-  - [s]Implement PWM fan control[/s]
+  - ~~~Implement PWM fan control~~~
   - Detailed setup instructions
