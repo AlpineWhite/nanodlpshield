@@ -33,7 +33,7 @@ void setSteperLowSpeed()
 
 void setSteperHighSpeed()
 {
-    stepper.setSpeedInMillimetersPerSecond(HIGH_SPEED); 
+    stepper.setSpeedInMillimetersPerSecond(HIGH_SPEED);
     stepper.setAccelerationInMillimetersPerSecondPerSecond(HIGH_ACCELERATION);
 }
 
@@ -167,10 +167,27 @@ void setup()
 
     // Signaling (general purpose) LED
     pinMode(LED_PIN, OUTPUT);
-    
-    // FAN
+
+    // FAN PWM Range is 0-1024 and called via pwmWrite(int pin, int value)
+    // Initialize as off
     pinMode(FAN_PIN, OUTPUT);
-    digitalWrite(FAN_PIN, 1);
+    pwmWrite(FAN_PIN, 0);
+
+    //ENDSTOPS
+    pinMode(Z_STOP_PIN, INPUT);
+    pullUpDnControl(Z_STOP_PIN, Z_STOP_PUD);
+}
+
+bool checkMCommand(const char * buf, char prefix)
+{
+  const char * ptr = buf;
+  ptr = strchr(ptr, prefix);
+  if(ptr == NULL)
+  {
+    return false;
+  } else {
+    return true;
+  }
 }
 
 int parseInt(const char * buf, char prefix, int value)
@@ -248,7 +265,13 @@ bool parseGCommand(const char * cmd)
             processPauseCmd(duration);
             return true;
         }
-
+        case 28: // G28 Home
+        {
+          // Set direction, speed, travel, and endstop in Config.h
+          stepper.moveToHomeInMillimeters(HOME_DIR, HOME_SPD, HOME_HEIGHT, Z_STOP_PIN);
+          ptyWrite("Z_move_comp");
+          updateLastMovement();
+        }
         case 90: // G90 - Set Absolute Positioning
             relativePositioning = false;
             return true;
@@ -268,14 +291,31 @@ bool parseMCommand(const char * cmd)
     switch(cmdID)
     {
     case 3: // M3/M106 - UV LED On
-    case 106: 
-        processLEDOnCmd();
-        return true;
+    case 106:
+    {
+        if(checkMCommand(cmd, 'P'))
+        {
+          float spd = parseFloat(cmd, 'S', 0);
+          pwmWrite(FAN_PIN, spd);
+        } else {
+          processLEDOnCmd();
+          return true;
+        }
+
+    }
 
     case 5: // M5/M107 - UV LED Off
     case 107:
-        processLEDOffCmd();
-        return true;
+    {
+        if(checkMCommand(cmd, 'P'))
+        {
+          pwmWrite(FAN_PIN, 0);
+        } else {
+          processLEDOffCmd();
+          return true;
+        }
+
+    }
 
     case 17: // M17 - Motor on
         processMotorOnCmd();
@@ -293,7 +333,22 @@ bool parseMCommand(const char * cmd)
         ptyWrite(s.str());
         return true;
     }
+    case 300:
+    {
+        if(checkMCommand(cmd, 'S'))
+        {
+          long i = millis();
+          float len = parseFloat(cmd, 'S', 0);
+          long j = i+len;
+          while(islessequal(i,j))
+          {
+            digitalWrite(BUZZ_PIN,1);
+          }
+          digitalWrite(BUZZ_PIN,0);
+        }
     }
+    }
+
 
     return false;
 }
@@ -338,7 +393,7 @@ int main(int argc, char** argv)
             updateLastMovement();
         }
 #endif //SUPPORT_UP_DOWN_BUTTONS
-        
+
 #if SUPPORT_LED_ON_BUTTON
         if(isButtonPressed(LED_ON_BTN_PIN))
             processLEDButon();

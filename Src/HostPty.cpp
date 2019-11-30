@@ -65,4 +65,3 @@ void HostPty::write(const std::string & str)
     ::write(_master, str.c_str(), str.size());
     ::write(_master, "\r\n", 2);
 }
-
