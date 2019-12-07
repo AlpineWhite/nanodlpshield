@@ -128,7 +128,7 @@ Z_STOP_PUd = 1 (for active high)
 Z_STOP_PUD = 2 (for active low)
 */
 
-//Enable support of limit switches.  THe pin  Set to 20 for bottom home, set to 21 for top home
+//Enable support of limit switches.
 const int Z_STOP_PIN = 20;
 
 //Pull UP/DN for limit switches. (Set to active low. Set PUD to 1 for active high)
