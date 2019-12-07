@@ -10,19 +10,29 @@
 
 using namespace std;
 
-SpeedyStepper stepper;
+#if defined(HAS_TMC_SPI)
 
-bool relativePositioning = true;
+#endif
+SpeedyStepper stepper;  //Define SpeedyStepper motor as stepper
+
+bool relativePositioning = true;  //Use relative positioning
 unsigned long lastMovementMS = 0;
 
 HostPty pty("/tmp/ttyNanoDLP");
 
-void ptyWrite(const string & str)
+void ptyWrite(const string & str)  //Write string to virtual console
 {
     pty.write(str);
     cout << str << endl;
 }
 
+#if defined(HAS_2130)
+//TMC2130Stepper driver = TMC2130Stepper(CS_PIN, R_SENSE, SW_MOSI, SW_MISO, SW_SCK); // Software SPI
+#elif defined(HAS_2660)
+//TMC2660Stepper driver = TMC2660Stepper(CS_PIN, R_SENSE, SW_MOSI, SW_MISO, SW_SCK);
+#elif defined(HAS_5160)
+//TMC5160Stepper driver = TMC5160Stepper(CS_PIN, R_SENSE, SW_MOSI, SW_MISO, SW_SCK);
+#endif
 
 #if SUPPORT_UP_DOWN_BUTTONS
 void setSteperLowSpeed()
@@ -35,11 +45,6 @@ void setSteperHighSpeed()
 {
     stepper.setSpeedInMillimetersPerSecond(HIGH_SPEED);
     stepper.setAccelerationInMillimetersPerSecondPerSecond(HIGH_ACCELERATION);
-}
-
-bool isButtonPressed(int btnPin)
-{
-    return digitalRead(btnPin) == LOW;
 }
 
 void processBtnMovement(int btnPin, int direction = 1)
@@ -92,33 +97,38 @@ void processBtnMovement(int btnPin, int direction = 1)
 }
 #endif //SUPPORT_UP_DOWN_BUTTONS
 
-void updateLastMovement()
+bool isButtonPressed(int btnPin) //Check for button press (GPIO pulled low)
+{
+    return digitalRead(btnPin) == LOW;
+}
+
+void updateLastMovement() //Update time since last move command
 {
     lastMovementMS = millis();
 }
 
-bool shouldDisableMotors()
+bool shouldDisableMotors() //If over 100S since last movement, motor is disabled
 {
     return millis() - lastMovementMS > 100000; // 100 seconds
 }
 
-void processMotorOnCmd() //M17
+void processMotorOnCmd() //M17 enable motor driver
 {
     updateLastMovement();
     digitalWrite(ENABLE_PIN, LOW);
 }
 
-void processMotorOffCmd() //M18
+void processMotorOffCmd() //M18 disable motor driver
 {
     digitalWrite(ENABLE_PIN, HIGH);
 }
 
-void processLEDOnCmd() // M3 or M106
+void processLEDOnCmd() // M3 or M106 turn on UV LED
 {
     digitalWrite(UV_LED_PIN, HIGH);
 }
 
-void processLEDOffCmd() // M5 or M107
+void processLEDOffCmd() // M5 or M107 turn off UV LED
 {
     digitalWrite(UV_LED_PIN, LOW);
 }
@@ -155,7 +165,7 @@ void setup()
     pullUpDnControl(DOWN_BTN_PIN, DOWN_BTN_PUD);
 #endif //SUPPORT_UP_DOWN_BUTTONS
 
-    // Init UV LED MOSFET Pin
+    // Init UV LED MOSFET Pin as off
     pinMode(UV_LED_PIN, OUTPUT);
     digitalWrite(UV_LED_PIN, LOW);
 
@@ -290,67 +300,84 @@ bool parseMCommand(const char * cmd)
     int cmdID = parseInt(cmd, 'M', 0);
     switch(cmdID)
     {
-    case 3: // M3/M106 - UV LED On
-    case 106:
-    {
-        if(checkMCommand(cmd, 'P'))
+
+        case 3:// M3/M106 - UV LED On
         {
-          float spd = parseFloat(cmd, 'S', 0);
-          pwmWrite(FAN_PIN, spd);
-        } else {
-          processLEDOnCmd();
-          return true;
+            processLEDOnCmd();
+            return true;
         }
 
-    }
-
-    case 5: // M5/M107 - UV LED Off
-    case 107:
-    {
-        if(checkMCommand(cmd, 'P'))
+        case 106:
         {
-          pwmWrite(FAN_PIN, 0);
-        } else {
-          processLEDOffCmd();
-          return true;
+            if(checkMCommand(cmd, 'P'))
+            {
+                float spd = parseFloat(cmd, 'S', 0);
+                pwmWrite(FAN_PIN, spd);
+            } else {
+                processLEDOnCmd();
+                return true;
+            }
         }
 
-    }
-
-    case 17: // M17 - Motor on
-        processMotorOnCmd();
-        return true;
-
-    case 18: // M18 - Motor off
-        processMotorOffCmd();
-        return true;
-
-    case 114: // M114 - Get current position
-    {
-        float pos = stepper.getCurrentPositionInMillimeters();
-        stringstream s;
-        s << "Z:" << std::setprecision(2) << pos;
-        ptyWrite(s.str());
-        return true;
-    }
-    case 300:
-    {
-        if(checkMCommand(cmd, 'S'))
+        case 5: // M5/M107 - UV LED Off
         {
-          long i = millis();
-          float len = parseFloat(cmd, 'S', 0);
-          long j = i+len;
-          while(islessequal(i,j))
-          {
-            digitalWrite(BUZZ_PIN,1);
-          }
-          digitalWrite(BUZZ_PIN,0);
+            processLEDOffCmd();
+            return true;
         }
-    }
-    }
+
+        case 107:
+        {
+            if(checkMCommand(cmd, 'P'))
+            {
+                pwmWrite(FAN_PIN, 0);
+            } else {
+            processLEDOffCmd();
+            return true;
+            }
+        }
+
+        case 17: // M17 - Motor on
+        {
+            processMotorOnCmd();
+            return true;
+        }
+
+        case 18: // M18 - Motor off
+        {
+            processMotorOffCmd();
+            return true;
+        }
+
+        case 114: // M114 - Get current position
+        {
+            float pos = stepper.getCurrentPositionInMillimeters();
+            stringstream s;
+            s << "Z:" << std::setprecision(2) << pos;
+            ptyWrite(s.str());
+            return true;
+        }
+
+        case 300:
+        {   
+            #if SUPPORT_BUZZER
+            if(checkMCommand(cmd, 'S'))
+            {
+                long i = millis();
+                float len = parseFloat(cmd, 'S', 0);
+                long j = i+len;
+                while(islessequal(i,j))
+                {
+                    digitalWrite(BUZZ_PIN,1);
+                }
+                digitalWrite(BUZZ_PIN,0);
+            }
+            #endif
+            return true;
+        }
 
 
-    return false;
+        return false;
+    }
 }
 
 bool parseCommand(const char * cmd)
@@ -370,7 +397,7 @@ bool parseCommand(const char * cmd)
     return false;
 }
 
-int main(int argc, char** argv)
+void main(int argc, char** argv)
 {
     setup();
 
@@ -378,7 +405,7 @@ int main(int argc, char** argv)
     {
         //checkAlive();
 
-#if SUPPORT_UP_DOWN_BUTTONS
+        #if SUPPORT_UP_DOWN_BUTTONS
         if(isButtonPressed(UP_BTN_PIN))
         {
             processMotorOnCmd();
@@ -392,14 +419,15 @@ int main(int argc, char** argv)
             processBtnMovement(DOWN_BTN_PIN, -1);
             updateLastMovement();
         }
-#endif //SUPPORT_UP_DOWN_BUTTONS
+        #endif //SUPPORT_UP_DOWN_BUTTONS
 
-#if SUPPORT_LED_ON_BUTTON
+        #if SUPPORT_LED_ON_BUTTON
         if(isButtonPressed(LED_ON_BTN_PIN))
             processLEDButon();
-
-#endif //SUPPORT_LED_ON_BUTTON
+        #endif //SUPPORT_LED_ON_BUTTON
+        
         string cmd;
+
         if(pty.receiveNextString(cmd))
         {
             cout << "Received line: " << cmd << endl;
@@ -417,8 +445,9 @@ int main(int argc, char** argv)
         }
 
         if(shouldDisableMotors() && !digitalRead(ENABLE_PIN))
-            processMotorOffCmd();
+            {
+                processMotorOffCmd();
+            } 
     }
-
-    return 0;
+    
 }

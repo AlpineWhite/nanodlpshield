@@ -32,29 +32,32 @@ Communication between the shield and NanoDLP software is implemented via pseudo-
 Schematics and PCB can be found [here](https://easyeda.com/editor#id=1c84f9033af4487bb82d24a9e845125c|2ef221c521474696ba044a7bebf7602c).
 
 BOM:
--MFR Part:            MFR:               QTY:
-- BSS138	            ON Semiconductor	  4
-- 106990005           Seeed Studio	      1
-- MB 12	              Visaton	            1
-- ERJ-UP8F4701V	      Panasonic	          19
-- CRCW12060000Z0EAC  	Vishay	            6
-- 2N7002	            ON Semiconductor	  1
-- UVZ1H101MPD1TD	    Nichicon	          1
-- 90147-1108	        Molex	              2
-- M20-9990345	        Harwin	            8
-- M20-9720345	        Harwin	            1
-- M20-9720245	        Harwin	            2
-- OQ025A000000G	      Amphenol	          2
-- M20-9730245	        Harwin	            2
-- M20-9990445	        Harwin	            2
-- URS1H101MPD1TD	    Nichicon	          1
-- CRCW1206120RFKEAC	  Vishay	            4
-- VJ1206Y104JXAMR	    Vishay	            8
-- UMK316BJ105KD-T	    Taiyo Yuden	        1
-- FDLL4148-D87Z	      ON Semiconductor	  1
-- 76342-320HLF	      FCI / Amphenol	    1
-- DMN3150L-7	        Diodes Incorporated	1
-- IRL2203NPBF	        Infineon	          1
+| MFR Part           | MFR                 | QTY |
+| ------------------ | ------------------- | ---:|
+| BSS138	            | ON Semiconductor	 | 4   |
+| 106990005          | Seeed Studio	       | 1   |
+| MB 12	            | Visaton	          | 1   |
+| ERJ-UP8F4701V	   | Panasonic	          | 19  |
+| CRCW12060000Z0EAC  | Vishay	             | 6   |
+| 2N7002	            | ON Semiconductor	 | 1   |
+| UVZ1H101MPD1TD	   | Nichicon	          | 1   |
+| 90147-1108	      | Molex	             | 2   |
+| M20-9990345	      | Harwin	             | 8   |
+| M20-9720345	      | Harwin	             | 1   |
+| M20-9720245	      | Harwin	             | 2   |
+| OQ025A000000G	   | Amphenol	          | 2   |
+| M20-9730245	      | Harwin	             | 2   |
+| M20-9990445	      | Harwin	             | 2   |
+| URS1H101MPD1TD	   | Nichicon	          | 1   |
+| CRCW1206120RFKEAC	| Vishay	             | 4   |
+| VJ1206Y104JXAMR	   | Vishay	             | 8   |
+| UMK316BJ105KD-T	   | Taiyo Yuden	       | 1   |
+| FDLL4148-D87Z	   | ON Semiconductor	 | 1   |
+| 76342-320HLF	      | FCI / Amphenol	    | 1   |
+| DMN3150L-7	      | Diodes Incorporated |	1   |
+| IRL2203NPBF	      | Infineon	          | 1   |
+
+Any of the components can be swapped for equivalents at the user's discretion if you have brand preferences.
 
 Choice: Add 2x JST-XH 3-Pin and 1x JST-XH 4-Pin for Motor + E-stop connectors or substitute with bare pin headers.
 
@@ -76,14 +79,18 @@ sudo apt-get install cmake g++ wiringpi
 
 # Building
 -Install git on the Raspberry Pi.
--Git clone the repo
+-Git clone the repo:
+```bash
+   git clone https://github.com/AlpineWhite/nanodlpshield.git
+```
+
 -Use Nano to edit:
     -> Config.h
         -> steps/mm and leadscrew settings
         -> set speeds and accelerations
-        -> set the pull up/dn mode per active high or active low endstops
-        -> set endstop at top or bottom (pin definition 21 for top 20 for bottom)
-        -> defined/commented hardware button support
+        -> set the endstop pin and pull up/dn mode per active high or active low endstop
+        -> defined/undefined hardware button support
+        -> defined/undefined buzzer enable
 
  create cmake dependencies with:
  ```bash
@@ -110,34 +117,38 @@ sudo apt-get install cmake g++ wiringpi
 
  Open NanoDLP Web GUI, set the shield mode to USB/I2C and set the address to the value returned from 'Name:'.
 
+ NanoDLP requires some extra setup for a 'through shield' implementation.  You can find a guide [for setting up pre/post print commands and resin profile GCode commands here.](https://www.nanodlp.com/forum/viewtopic.php?id=41)
+
 # NOTE: I have to build each Gcode Manually. Current commands are:
 
  - G1
- - G4
- - G28
+ - G4 (wait)
+ - G28 (home)
  - G90
  - G91
  - M3 / M106 (UV LED On)
- - M106 P1 SXXXX (set fan headers to PWM value XXXX between 0 and 1023)
+ - M106 P1 Snnnn (set fan headers to PWM value nnnn between 0 and 1023)
  - M5 / M107 (UV LED Off)
  - M107 P1 (turn all fans off)
  - M18 (disable motors)
  - M114 (get current position)
+ - M300 Snnn (sound buzzer for Snnn seconds)
 
 
 # Limitations:
 
  Since NanoDLP does not provide a way for RAMPS/Serial to write back, NanoDLP will not show the result of commands sent through the RAMPS terminal (primarily LED On/Off and current position if sent via Terminal).
 
- However, NanaoDLP does execute the Gcode via the terminal, so any commands triggered via the NanoDLP UI will reflect properly.
+ NanoDLP does execute the Gcode via the terminal, so any commands triggered via the NanoDLP UI or during printing will reflect properly.
 
 # Planned additions:
 
  Configuration options for:
-  - ~~~Max Height~~~
-  - ~~~Max Speeds~~~
-  - ~~~Motion parameters via Config.h~~~
-  - ~~~Max Accelerations~~~
-  - Fan control based on printing (fans on when UV LED is on and then on for 5 mins after finish of print)
-  - ~~~Implement PWM fan control~~~
+  - <strike>Max Height</strike>
+  - <strike>Max Speeds</strike>
+  - <strike>Motion parameters via Config.h</strike>
+  - <strike>Max Accelerations</strike>
+  - <strike>Implement PWM fan control</strike>
+  - <strike>Fan control based on printing (fans on when UV LED is on and then on for 5 mins after finish of print)</strike> This can be done using NanoDLP GCode boxes now that PWM fan control is used.
   - Detailed setup instructions
+  - TMC SPI control for motion.  This will probably take the longest.
