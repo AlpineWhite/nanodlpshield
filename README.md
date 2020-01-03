@@ -29,7 +29,7 @@ Communication between the shield and NanoDLP software is implemented via pseudo-
 
 # Hardware
 
-Schematics and PCB can be found [here](https://easyeda.com/editor#id=1c84f9033af4487bb82d24a9e845125c|2ef221c521474696ba044a7bebf7602c).
+Schematics and PCB V1.2 can be found [here](https://easyeda.com/editor#id=|54ad5a3a352e4a90804909cb4819c47c|c782efdc5bfa4d89bbee21e779a59103).
 
 BOM:
 
