@@ -25,13 +25,13 @@ Set the HAS_TMC_SPI define to 1 to enable SPi control for TMC steppers.
 GPIO 8 and 11 will be unavailable.
 DO NOT INSTALL RESISTORS ON THESE IF YOU PLAN TO USE TMC STEPPERS
 */
-#define HAS_TMC_SPI 0               
+#define HAS_TMC_SPI 1               
 #if HAS_TMC_SPI
 const int CS_PIN = 8;
 const int SW_MOSI = 10;
 const int SW_MISO = 9;
 const int SW_SCK = 11;
-const float R_SENSE = .2;          //Enter sense resistor value from step stick mfg datasheet
+const float R_SENSE = .075;          //Enter sense resistor value from step stick mfg datasheet
 // Select your stepper driver type by uncommenting it
 //#define HAS_2130 1
 //#define HAS_2660 1
@@ -71,6 +71,7 @@ Recommend default values for 5/5" build plates, lower values for larger plates.
 
 // Pin #s where motor is connected. THese should not change.
 const int DIR_PIN = 5;
+const int VCC_PIN = 27;
 const int STEP_PIN = 6;
 const int ENABLE_PIN = 12;
 const int STEPS_PER_REV = 200; //Set steps/rev of motor. 200 for 1.8* 400 for .9* NEMA17
@@ -119,8 +120,8 @@ const int DOWN_BTN_PUD = 2; // PUD_UP
 
 This section controls the limit switches.  You can have a limit switch at the top or the bottom for homing movements.
 THe setting of the limit switch pins determines where the endstop lives.
-Set Z_STOP_PIN to 20 for a limit switch connected to the bottom position on the shield.
-Set Z_STOP_PIN to 21 for a limit switch connected to the top position on the shield.
+Set Z_STOP_PIN to 26 for a limit switch connected to the bottom position on the shield.
+Set Z_STOP_PIN to 16 for a limit switch connected to the top position on the shield.
 
 The Z_STOP_PUD setting determines if your endstops are active high (3.3v when triggered) or active low (GND when triggered).
 Consult your endstop switch documentation and set to:
@@ -129,7 +130,7 @@ Z_STOP_PUD = 2 (for active low)
 */
 
 //Enable support of limit switches.
-const int Z_STOP_PIN = 20;
+const int Z_STOP_PIN = 26;
 
 //Pull UP/DN for limit switches. (Set to active low. Set PUD to 1 for active high)
 const int Z_STOP_PUD = 2;
@@ -145,10 +146,10 @@ If the HOME_HEIGHT parameter is smaller than your Z-axis length, then homing wil
 For safety, set the HOME_HEIGHT value to your axis length +5mm
 */
 const long HOME_DIR;
-#if (Z_STOP_PIN == 20)
+#if (Z_STOP_PIN == 26)
     HOME_DIR = -1;
 #endif
-#if (Z_STOP_PIN == 21)
+#if (Z_STOP_PIN == 16)
     HOME_DIR = 1;
 #endif
 const float HOME_SPD = 10; // In mm/s
@@ -163,7 +164,7 @@ Enable this option if the printer has a hardware LED On/Off button.
 */
 //#define SUPPORT_LED_ON_BUTTON 1
 #if SUPPORT_LED_ON_BUTTON
-const int LED_ON_BTN_PIN = 13;
+const int LED_ON_BTN_PIN = 20;
 const int LED_ON_BTN_PUD = 2; // PUD_UP
 #endif //SUPPORT_LED_ON_BUTTON
 
@@ -175,7 +176,7 @@ const int LED_ON_BTN_PUD = 2; // PUD_UP
 const int UV_LED_PIN = 17;
 
 // Signaling LED pin
-const int LED_PIN = 16;
+const int LED_PIN = 21;
 
 // FAN pin
 const int FAN_PIN = 18;

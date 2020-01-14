@@ -1,19 +1,30 @@
 #include "HostPty.h"
 #include "SpeedyStepper.h"
 #include "Config.h"
+#include "TMCStepper.h"
 
 #include <wiringPi.h>
 #include <iostream>
 #include <cstring>
 #include <sstream>
 #include <iomanip>
+#include <bcm2835.h>
+#include <stdexcept>
 
 using namespace std;
 
-#if defined(HAS_TMC_SPI)
-
+#if HAS_2130
+    TMC2130Stepper driver = TMC2130Stepper(CS_PIN, R_SENSE, SW_MOSI, SW_MISO, SW_SCK);
+    SpeedyStepper stepper;  //Define SpeedyStepper motor as stepper
+#elif HAS_2660
+    TMC2660Stepper driver = TMC2660Stepper(CS_PIN, R_SENSE, SW_MOSI, SW_MISO, SW_SCK);
+    SpeedyStepper stepper;  //Define SpeedyStepper motor as stepper
+#elif HAS_5160
+    TMC5160Stepper driver = TMC5160Stepper(CS_PIN, R_SENSE, SW_MOSI, SW_MISO, SW_SCK);
+    SpeedyStepper stepper;  //Define SpeedyStepper motor as stepper
+#else 
+    SpeedyStepper stepper;  //Define SpeedyStepper motor as stepper
 #endif
-SpeedyStepper stepper;  //Define SpeedyStepper motor as stepper
 
 bool relativePositioning = true;  //Use relative positioning
 unsigned long lastMovementMS = 0;
@@ -26,13 +37,6 @@ void ptyWrite(const string & str)  //Write string to virtual console
     cout << str << endl;
 }
 
-#if defined(HAS_2130)
-//TMC2130Stepper driver = TMC2130Stepper(CS_PIN, R_SENSE, SW_MOSI, SW_MISO, SW_SCK); // Software SPI
-#elif defined(HAS_2660)
-//TMC2660Stepper driver = TMC2660Stepper(CS_PIN, R_SENSE, SW_MOSI, SW_MISO, SW_SCK);
-#elif defined(HAS_5160)
-//TMC5160Stepper driver = TMC5160Stepper(CS_PIN, R_SENSE, SW_MOSI, SW_MISO, SW_SCK);
-#endif
 
 #if SUPPORT_UP_DOWN_BUTTONS
 void setSteperLowSpeed()
@@ -146,15 +150,26 @@ void processLEDButon()
 void setup()
 {
     // General GPIO initialization
-    if (wiringPiSetupGpio () == -1)
+    if (wiringPiSetupGpio() == -1)
         throw std::runtime_error("Cannot initialize GPIO");
 
+#if HAS_TMC_SPI
+    pinMode(CS_PIN, OUTPUT);
+    digitalWrite(CS_PIN, HIGH);
+    driver.begin();             // Initiate pins and registeries
+    driver.rms_current(600);    // Set stepper current to 600mA. The command is the same as command TMC2130.setCurrent(600, 0.11, 0.5);
+    driver.en_pwm_mode(1);      // Enable extremely quiet stepping
+    driver.pwm_autoscale(1);
+    driver.microsteps(16);
+#endif
     // Init stepper motor
     stepper.connectToPins(STEP_PIN, DIR_PIN);
     stepper.setStepsPerMillimeter(STEPS_PER_MM);
     stepper.setSpeedInMillimetersPerSecond(DEFAULT_SPEED);
     stepper.setAccelerationInMillimetersPerSecondPerSecond(DEFAULT_ACCELERATION);
     pinMode(ENABLE_PIN, OUTPUT);
+    pinMode(VCC_PIN, OUTPUT);
+    digitalWrite(VCC_PIN, HIGH); // Apply VCCIO to motor to turn the driver on
     processMotorOffCmd();
 
 #if SUPPORT_UP_DOWN_BUTTONS
