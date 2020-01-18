@@ -8,6 +8,8 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "source/SW_SPI.h"
+#include <wiringPi.h>
+#include <bcm2835.h>
 
 #pragma GCC diagnostic pop
 

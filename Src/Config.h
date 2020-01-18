@@ -32,11 +32,17 @@ const int SW_MOSI = 10;
 const int SW_MISO = 9;
 const int SW_SCK = 11;
 const float R_SENSE = .075;          //Enter sense resistor value from step stick mfg datasheet
+const long RMS_A = 1105;             //Enter current in mA
+const float HOLD_MULT = .7;           //Set stantstill motor hold multiplier
 // Select your stepper driver type by uncommenting it
 //#define HAS_2130 1
 //#define HAS_2660 1
 //#define HAS_5130 1
 #define HAS_5160 1
+#define RAMP_MODE 1;
+#ifdef RAMP_MODE
+    const int X_COMP = 22;
+    #endif
 #endif
 
 //________________________________________________________________________________________________________________________________________
@@ -123,10 +129,8 @@ THe setting of the limit switch pins determines where the endstop lives.
 Set Z_STOP_PIN to 26 for a limit switch connected to the bottom position on the shield.
 Set Z_STOP_PIN to 16 for a limit switch connected to the top position on the shield.
 
-The Z_STOP_PUD setting determines if your endstops are active high (3.3v when triggered) or active low (GND when triggered).
+The Z_STOP_PUD setting must compliment your endstops! For active high (3.3v when triggered) set to 1; for active low (GND when triggered), set to 2.
 Consult your endstop switch documentation and set to:
-Z_STOP_PUd = 1 (for active high)
-Z_STOP_PUD = 2 (for active low)
 */
 
 //Enable support of limit switches.

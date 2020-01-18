@@ -2,6 +2,7 @@
 #include "SpeedyStepper.h"
 #include "Config.h"
 #include "TMCStepper.h"
+#include "GeneratorStepper.h"
 
 #include <wiringPi.h>
 #include <iostream>
@@ -15,18 +16,18 @@ using namespace std;
 
 #if HAS_2130
     TMC2130Stepper driver = TMC2130Stepper(CS_PIN, R_SENSE, SW_MOSI, SW_MISO, SW_SCK);
-    SpeedyStepper stepper;  //Define SpeedyStepper motor as stepper
+    SpeedyStepper stepper;
 #elif HAS_2660
     TMC2660Stepper driver = TMC2660Stepper(CS_PIN, R_SENSE, SW_MOSI, SW_MISO, SW_SCK);
-    SpeedyStepper stepper;  //Define SpeedyStepper motor as stepper
-#elif HAS_5160
+    SpeedyStepper stepper;
+#elif HAS_5160 && !RAMP_MODE
     TMC5160Stepper driver = TMC5160Stepper(CS_PIN, R_SENSE, SW_MOSI, SW_MISO, SW_SCK);
-    SpeedyStepper stepper;  //Define SpeedyStepper motor as stepper
-#else 
-    SpeedyStepper stepper;  //Define SpeedyStepper motor as stepper
+    SpeedyStepper stepper;
+#elif HAS_5160 && RAMP_MODE
+    GeneratorStepper stepper;
 #endif
 
-bool relativePositioning = true;  //Use relative positioning
+bool relativePositioning = false;  //Use absolute positioning
 unsigned long lastMovementMS = 0;
 
 HostPty pty("/tmp/ttyNanoDLP");
@@ -152,24 +153,27 @@ void setup()
     // General GPIO initialization
     if (wiringPiSetupGpio() == -1)
         throw std::runtime_error("Cannot initialize GPIO");
-
-#if HAS_TMC_SPI
-    pinMode(CS_PIN, OUTPUT);
-    digitalWrite(CS_PIN, HIGH);
+    bcm2835_spi_begin();
+#if !HAS_TMC_SPI
+    pinMode(VCC_PIN, OUTPUT);
+    digitalWrite(VCC_PIN, HIGH); // Apply VCCIO to motor to turn the driver on
+#elif HAS_TMC_SPI && !RAMP_MODE
     driver.begin();             // Initiate pins and registeries
-    driver.rms_current(600);    // Set stepper current to 600mA. The command is the same as command TMC2130.setCurrent(600, 0.11, 0.5);
-    driver.en_pwm_mode(1);      // Enable extremely quiet stepping
-    driver.pwm_autoscale(1);
-    driver.microsteps(16);
+    driver.rms_current(1105);    // Set stepper current to 1105mA. The command is the same as command TMC2130.setCurrent(600, 0.11, 0.5);
+    driver.microsteps(MICROSTEP_SET);
+#else
+    pinMode(VCC_PIN, OUTPUT);
+    digitalWrite(VCC_PIN, HIGH); // Apply VCCIO to motor to turn the driver on
 #endif
+
     // Init stepper motor
     stepper.connectToPins(STEP_PIN, DIR_PIN);
     stepper.setStepsPerMillimeter(STEPS_PER_MM);
     stepper.setSpeedInMillimetersPerSecond(DEFAULT_SPEED);
     stepper.setAccelerationInMillimetersPerSecondPerSecond(DEFAULT_ACCELERATION);
     pinMode(ENABLE_PIN, OUTPUT);
-    pinMode(VCC_PIN, OUTPUT);
-    digitalWrite(VCC_PIN, HIGH); // Apply VCCIO to motor to turn the driver on
+    pinMode(X_COMP, INPUT);
+    pullUpDnControl(X_COMP, PUD_DOWN);
     processMotorOffCmd();
 
 #if SUPPORT_UP_DOWN_BUTTONS

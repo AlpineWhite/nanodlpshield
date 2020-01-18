@@ -8,6 +8,7 @@ set(SOURCES
     Src/NanoDLPShield.cpp 
     Src/HostPty.cpp
     Src/SpeedyStepper.cpp
+    Src/GeneratorStepper.cpp
     )
 add_executable(NanoDlpShield ${SOURCES})
 target_link_libraries(NanoDlpShield ${wiringPi_LIB} util)
