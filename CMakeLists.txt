@@ -3,7 +3,7 @@ project (NanoDlpShield)
 
 find_library(wiringPi_LIB wiringPi)
 find_library(bcm2835_LIB bcm2835)
-add_subdirectory(Src/source)
+add_subdirectory(Src)
 include(addTMCStepper.cmake)
 
 
