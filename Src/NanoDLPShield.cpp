@@ -296,10 +296,11 @@ bool parseGCommand(const char * cmd)
         }
         case 28: // G28 Home
         {
-          // Set direction, speed, travel, and endstop in Config.h
-          stepper.moveToHomeInMillimeters(HOME_DIR, HOME_SPD, HOME_HEIGHT, Z_STOP_PIN);
-          ptyWrite("Z_move_comp");
-          updateLastMovement();
+            // Set direction, speed, travel, and endstop in Config.h
+            stepper.moveToHomeInMillimeters(HOME_DIR, HOME_SPD, HOME_HEIGHT, Z_STOP_PIN);
+            ptyWrite("Z_move_comp");
+            updateLastMovement();
+            return true;
         }
         case 90: // G90 - Set Absolute Positioning
             relativePositioning = false;
@@ -332,7 +333,8 @@ bool parseMCommand(const char * cmd)
             {
                 float spd = parseFloat(cmd, 'S', 0);
                 pwmWrite(FAN_PIN, spd);
-            } else {
+                return true;
+            }else{
                 processLEDOnCmd();
                 return true;
             }
@@ -349,9 +351,10 @@ bool parseMCommand(const char * cmd)
             if(checkMCommand(cmd, 'P'))
             {
                 pwmWrite(FAN_PIN, 0);
-            } else {
-            processLEDOffCmd();
-            return true;
+                return true;
+            }else{
+                processLEDOffCmd();
+                return true;
             }
         }
 
@@ -388,11 +391,18 @@ bool parseMCommand(const char * cmd)
                     digitalWrite(BUZZ_PIN,1);
                 }
                 digitalWrite(BUZZ_PIN,0);
+                return true;
+            }else{
+                long i = millis();
+                long j = i+1000;
+                while(islessequal(i,j))
+                {
+                    digitalWrite(BUZZ_PIN,1);
+                }
+                digitalWrite(BUZZ_PIN,0);
+                return true;
             }
-            return true;
         }
-
-
         return false;
     }
 }
@@ -414,7 +424,7 @@ bool parseCommand(const char * cmd)
     return false;
 }
 
-void main(int argc, char** argv)
+int main(int argc, char** argv)
 {
     setup();
 

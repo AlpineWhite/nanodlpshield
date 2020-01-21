@@ -147,13 +147,7 @@ First a pass at your default HOME_SPD then a second pass at 1mm/s for accurate h
 If the HOME_HEIGHT parameter is smaller than your Z-axis length, then homing will fail.
 For safety, set the HOME_HEIGHT value to your axis length +5mm
 */
-const long HOME_DIR;
-#if ( Z_STOP == 26)
-    HOME_DIR = -1;
-#endif
-#if (Z_STOP_PIN == 16)
-    HOME_DIR = 1;
-#endif
+const long HOME_DIR = -1;
 const float HOME_SPD = 10; // In mm/s
 const long HOME_HEIGHT = 160; //Set max dist to travel in mm during homing
 
