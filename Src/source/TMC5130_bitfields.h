@@ -240,8 +240,8 @@ struct MSCURACT_t {
   union {
     uint32_t sr : 32;
     struct {
-      uint8_t cur_a : 16,
-              cur_b : 16;
+      uint16_t cur_a : 16,
+               cur_b : 16;
     };
   };
 };
