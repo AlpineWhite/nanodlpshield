@@ -11,25 +11,25 @@ set(SOURCES
     Src/SpeedyStepper.cpp
     Src/GeneratorStepper.cpp
     Src/source/TMCStepper.cpp
-    src/Source/CHOPCONF.cpp
-    src/Source/COOLCONF.cpp
-    src/Source/DRV_CONF.cpp
-    src/Source/DRVCTRL.cpp
-    src/Source/DRVSTATUS.cpp
-    src/Source/ENCMODE.cpp
-    src/Source/GCONF.cpp
-    src/Source/IHOLD_IRUN.cpp
-    src/Source/PWMCONF.cpp
-    src/Source/RAMP_STAT.cpp
-    src/Source/SGCSCONF.cpp
-    src/Source/SMARTEN.cpp
-    src/Source/SW_MODE.cpp
-    src/Source/SW_SPI.cpp
-    src/Source/TMC2130Stepper.cpp
-    src/Source/TMC2160Stepper.cpp
-    src/Source/TMC2660Stepper.cpp
-    src/Source/TMC5130Stepper.cpp
-    src/Source/TMC5160Stepper.cpp
+    Src/source/CHOPCONF.cpp
+    Src/source/COOLCONF.cpp
+    Src/source/DRV_CONF.cpp
+    Src/source/DRVCTRL.cpp
+    Src/source/DRVSTATUS.cpp
+    Src/source/ENCMODE.cpp
+    Src/source/GCONF.cpp
+    Src/source/IHOLD_IRUN.cpp
+    Src/source/PWMCONF.cpp
+    Src/source/RAMP_STAT.cpp
+    Src/source/SGCSCONF.cpp
+    Src/source/SMARTEN.cpp
+    Src/source/SW_MODE.cpp
+    Src/source/SW_SPI.cpp
+    Src/source/TMC2130Stepper.cpp
+    Src/source/TMC2160Stepper.cpp
+    Src/source/TMC2660Stepper.cpp
+    Src/source/TMC5130Stepper.cpp
+    Src/source/TMC5160Stepper.cpp
     )
 add_executable(NanoDlpShield ${SOURCES})
 target_link_libraries(NanoDlpShield ${wiringPi_LIB} ${bcm2835_LIB} util)
