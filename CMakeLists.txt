@@ -32,4 +32,4 @@ set(SOURCES
     src/Source/TMC5160Stepper.cpp
     )
 add_executable(NanoDlpShield ${SOURCES})
-target_link_libraries(NanoDlpShield ${wiringPi_LIB} util)
+target_link_libraries(NanoDlpShield ${wiringPi_LIB} ${bcm2835_LIB} util)
