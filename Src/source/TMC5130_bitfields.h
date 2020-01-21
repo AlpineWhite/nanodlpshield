@@ -235,4 +235,15 @@ struct MSLUTSTART_t {
   };
 };
 
+struct MSCURACT_t {
+  constexpr static uint8_t address = 0x6B;
+  union {
+    uint32_t sr : 32;
+    struct {
+      uint8_t cur_a : 16,
+              cur_b : 16;
+    };
+  };
+};
+
 #pragma pack(pop)
