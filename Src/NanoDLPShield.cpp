@@ -378,7 +378,6 @@ bool parseMCommand(const char * cmd)
 
         case 300:
         {   
-            #if SUPPORT_BUZZER
             if(checkMCommand(cmd, 'S'))
             {
                 long i = millis();
@@ -390,7 +389,6 @@ bool parseMCommand(const char * cmd)
                 }
                 digitalWrite(BUZZ_PIN,0);
             }
-            #endif
             return true;
         }
 

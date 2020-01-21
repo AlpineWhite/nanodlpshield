@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include "TMCStepper.h"
 #include <math.h>
+#include "Config.h"
 typedef uint8_t byte;
 
 //

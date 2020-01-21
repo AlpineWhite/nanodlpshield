@@ -1,0 +1,23 @@
+add_library(
+    TMCStepper
+    src/Source/TMCStepper.cpp
+    src/Source/CHOPCONF.cpp
+    src/Source/COOLCONF.cpp
+    src/Source/DRV_CONF.cpp
+    src/Source/DRVCTRL.cpp
+    src/Source/DRVSTATUS.cpp
+    src/Source/ENCMODE.cpp
+    src/Source/GCONF.cpp
+    src/Source/IHOLD_IRUN.cpp
+    src/Source/PWMCONF.cpp
+    src/Source/RAMP_STAT.cpp
+    src/Source/SGCSCONF.cpp
+    src/Source/SMARTEN.cpp
+    src/Source/SW_MODE.cpp
+    src/Source/SW_SPI.cpp
+    src/Source/TMC2130Stepper.cpp
+    src/Source/TMC2160Stepper.cpp
+    src/Source/TMC2660Stepper.cpp
+    src/Source/TMC5130Stepper.cpp
+    src/Source/TMC5160Stepper.cpp
+)

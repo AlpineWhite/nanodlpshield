@@ -12,10 +12,8 @@ Snnn = tine to buzz in seconds
 This will consume GPIO7.
 */ 
 
-#define SUPPORT_BUZZER 0   
-#if SUPPORT_BUZZER
 const int BUZZ_PIN = 8;
-#endif
+
 
 //_______________________________________________________________________________________________________________________________________
 //////// TMC SPI Settings ///////////////
@@ -39,7 +37,7 @@ const float HOLD_MULT = .7;           //Set stantstill motor hold multiplier
 //#define HAS_2660 1
 //#define HAS_5130 1
 #define HAS_5160 1
-#define RAMP_MODE 1;
+#define RAMP_MODE 1
 #ifdef RAMP_MODE
     const int X_COMP = 22;
     #endif
@@ -150,7 +148,7 @@ If the HOME_HEIGHT parameter is smaller than your Z-axis length, then homing wil
 For safety, set the HOME_HEIGHT value to your axis length +5mm
 */
 const long HOME_DIR;
-#if (Z_STOP_PIN == 26)
+#if ( Z_STOP == 26)
     HOME_DIR = -1;
 #endif
 #if (Z_STOP_PIN == 16)
