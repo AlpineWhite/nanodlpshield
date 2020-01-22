@@ -3,6 +3,7 @@
 //#include <Arduino.h>
 //#include <wiringPi.h>
 //#include "TMC_platforms.h"
+#include <stdint.h>
 
 class SW_SPIClass {
 	public:
