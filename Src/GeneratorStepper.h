@@ -12,10 +12,8 @@ typedef uint8_t byte;
 //
 // the SpeedyStepper class
 //
-TMC5160Stepper driver = TMC5160Stepper(CS_PIN, R_SENSE, SW_MOSI, SW_MISO, SW_SCK);
-double drvClock = 12500000;
-float ta2 = ((pow(2,41))/drvClock); //(2147483648/15258790625)
-float t = (pow(2,24))/(pow(drvClock, 2));  //(524288/390625)
+
+
 
 class GeneratorStepper
 {

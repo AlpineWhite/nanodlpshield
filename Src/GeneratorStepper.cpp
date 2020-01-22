@@ -9,6 +9,11 @@
 //                                  Setup functions
 // ---------------------------------------------------------------------------------
 
+double drvClock = 12500000;
+float ta2 = ((pow(2,41))/drvClock); //(2147483648/15258790625)
+float t = (pow(2,24))/(pow(drvClock, 2));  //(524288/390625)
+TMC5160Stepper driver = TMC5160Stepper(CS_PIN, R_SENSE, SW_MOSI, SW_MISO, SW_SCK);
+
 //
 // constructor for the stepper class
 //
@@ -34,6 +39,7 @@ GeneratorStepper::GeneratorStepper()
   currentStepPeriod_InUS = 0.0;
   neg_travel = 0;
   pos_travel = 165;
+  
 }
 
 void GeneratorStepper::rampSettings(double vstart, double a1, double v1, double amax, double vmax, double dmax, double d1, double vstop)

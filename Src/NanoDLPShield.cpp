@@ -403,8 +403,8 @@ bool parseMCommand(const char * cmd)
                 return true;
             }
         }
-        return false;
     }
+    return false;
 }
 
 bool parseCommand(const char * cmd)
