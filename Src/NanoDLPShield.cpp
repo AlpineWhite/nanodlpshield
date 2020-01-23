@@ -373,11 +373,9 @@ bool parseMCommand(const char * cmd)
             }
             #endif
             return true;
-        }
-
-
-        return false;
+        }        
     }
+    return false;
 }
 
 bool parseCommand(const char * cmd)
@@ -397,7 +395,7 @@ bool parseCommand(const char * cmd)
     return false;
 }
 
-void main(int argc, char** argv)
+int main(int argc, char** argv)
 {
     setup();
 
