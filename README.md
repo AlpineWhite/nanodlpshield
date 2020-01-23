@@ -29,38 +29,38 @@ Communication between the shield and NanoDLP software is implemented via pseudo-
 
 # Hardware
 
-Schematics and PCB V1.2 can be found [here](https://easyeda.com/editor#id=|54ad5a3a352e4a90804909cb4819c47c|c782efdc5bfa4d89bbee21e779a59103).
+Schematics and PCB V1.2 can be found [here](https://easyeda.com/p.cartwrig/nanodlpshieldintegrated_copy).
 
 BOM:
 
-MFR Part | MFR | QTY 
----| --- | --- 
-BSS138 | ON Semiconductor | 4   
-106990005 | Seeed Studio | 1   
-MB 12	| Visaton | 1   
-ERJ-UP8F4701V | Panasonic | 19  
-CRCW12060000Z0EAC | Vishay	| 6   
-2N7002 | ON Semiconductor | 1   
-UVZ1H101MPD1TD	| Nichicon | 1   
-90147-1108 | Molex | 2   
-M20-9990345	| Harwin	| 8   
-M20-9720345 | Harwin	| 1   
-M20-9720245 | Harwin	| 2   
-OQ025A000000G | Amphenol | 2   
-M20-9730245	| Harwin | 2   
-M20-9990445	| Harwin | 2   
-URS1H101MPD1TD	| Nichicon | 1   
-CRCW1206120RFKEAC	| Vishay | 4   
-VJ1206Y104JXAMR | Vishay | 8   
-UMK316BJ105KD-T | Taiyo Yuden	| 1   
-FDLL4148-D87Z | ON Semiconductor	| 1   
-76342-320HLF | FCI / Amphenol	| 1   
-DMN3150L-7 | Diodes Incorporated |	1   
-IRL2203NPBF | Infineon | 1   
+MFR Part | MFR | PACKAGE | QTY 
+---| --- | --- | ---   
+WJ2EDGVC-5.08-2P | NGK | 5.08mm Pluggable 2-Pin Header | 2   
+C27438 | BOOMELE | 8-Pin Female Header | 2   
+C35165 | BOOMELE | 40-Pin Through-Hole 2-Row Header | 1  
+WJ2EDGK-5.08-2P | NGK | 2-Position Pluggable Male Terminal 5.08mm |  2   
+C116600 | LCSC | TO-220 Heatsink | 1   
+C124378 | LCSC | 4-Pin Male 2.54mm Header | 20   
+C132448 | LCSC | 2-Pin 2.54mm Jumper | 10   
+IPP80N08S2L07AKSA1 | Infineon | TO-220 N-Channel MOSFET | 1   
+ENB1CM471F12OTF3 | AISHI | 470uF 8x12mm 16V Capacitor | 1   
+A2541HWV-3P | CJT | 3-Pin 2.54mm Female Header | 1   
+HNDZ-1206 | Jiangsu | 12mmx6mm Buzzer | 1   
+LKMD1151J121MF	| YMIN | 120uF 8x11.5mm 63V Capacitor | 1 
+LL4148 | Guangdong Hottech | SOD-80 Diode | 1
+AC1206FR-074K7L | Yageo/Vishay | 1206R 4.7k-Ohm | 11
+RC1206FR-07120RL | Yageo/Vishay | 1206R 120-Ohm | 4
+AC1206FR-070RL | Yageo/Vishay | 1206R 0-Ohm | 6
+1206B105K101 | Walsin | 1206C 1uF | 1
+DMN6075S-7 | Diodes Inc. | SOT-23 N-Channel MOSFET | 1
+2N7002K-T1-GE3 | Vishay | SOT-23 2N7002 MOSFET| 1
+TCC1206X7R104K500DT | CCTC | 1206C 100nF | 8
+MP1584EN | Multiple | MP1584 5V Fixed Buck | 1
+
+Cost savings are achieved by having all parts orderable from LCSC at the same time as the PCB is ordered.  Components were chosen so that all SMD can be ordered with pick-&-place services from JLCPCB.  Headers have minimum order quantities, so 4-pin headers are broken-down to populate smaller header locations.
 
 Any of the components can be swapped for equivalents at the user's discretion if you have brand preferences.
 
-Choice: Add 2x JST-XH 3-Pin and 1x JST-XH 4-Pin for Motor + E-stop connectors or substitute with bare pin headers.
 
 # Software
 
@@ -68,14 +68,27 @@ Choice: Add 2x JST-XH 3-Pin and 1x JST-XH 4-Pin for Motor + E-stop connectors or
 NanoDlp Easy Installer throws dhcpcd5 package errors. This will cause the Pi to hang and fail after install. Please only use the advanced install with wget on the NanoDlp install page.
 ***
 
-Software is based on WiringPi library which provides a Arduino-like interface to drive RasPi's GPIOs. WiringPi is no longer in development, and its creator will no longer support it.  I am in search of alternate C++/C implementations. Java is too slow for real-time interrupts. Tests on a Pi2 show Java capped at ~20kHz and C/C++ at closer to 4MHz GPIO square wave output.
+Software is based on [WiringPi](https://github.com/WiringPi/WiringPi) library which provides a Arduino-like interface to drive RasPi's GPIOs. WiringPi is no longer in development by the original author, and its creator will no longer support it.  All support is community-based going forward.
+
+The [BCM2835](https://www.airspayce.com/mikem/bcm2835/) library is used to handle SPI communication to the TMC steppers, due to its inbuilt transfer() and transfernb() functions.
 
 Additionally it uses
-[SpeedyStepper](https://github.com/Stan-Reifel/SpeedyStepper) library with minor modifications to drive stepper motor.
+[SpeedyStepper](https://github.com/Stan-Reifel/SpeedyStepper) library with minor modifications to drive the stepper motor.
+For TMC SPi control, a modified version of the [TMCStepper](https://github.com/teemuatlut/TMCStepper) library is included in the code with a GeneratorStepper class created on the SpeedyStepper template handling SPI calls to the ramp generator in the TMC5160 and TMC5130 ICs.
 
 Installing prerequisites
 ```bash
 sudo apt-get install cmake g++ wiringpi
+```
+
+Installing bcm2835 Library
+```bash
+sudo apt-get install html-xml-utils
+mkdir -p bcm2835 && (wget -qO - `curl -sL http://www.airspayce.com/mikem/bcm2835 | hxnormalize -x -e | hxselect -s '\n' -c "div.textblock>p:nth-child(4)>a:nth-child(1)"` | tar xz --strip-components=1 -C bcm2835 )
+cd bcm2835
+./configure
+make
+sudo make install
 ```
 
 # Building
@@ -89,9 +102,10 @@ sudo apt-get install cmake g++ wiringpi
     -> Config.h
         -> steps/mm and leadscrew settings
         -> set speeds and accelerations
+        -> set TMC stepper support (in testing/development) options
         -> set the endstop pin and pull up/dn mode per active high or active low endstop
+        -> set homing direction
         -> defined/undefined hardware button support
-        -> defined/undefined buzzer enable
 
  create cmake dependencies with:
  ```bash
